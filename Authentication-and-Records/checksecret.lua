@@ -36,14 +36,14 @@ local function record_secret(apikey)
   )
 
   if remote_res == nil then
-      ngx.status = ngx.HTTP_UNAUTHORIZED
+      ngx.status = ngx.HTTP_BAD_GATEWAY
       ngx.log(ngx.ERR, " record_secret:", err)
-      ngx.say(json.encode({msg="Authentication failed, please contact the system administrator."}))
+      ngx.say(json.encode({msg="Server Error, please contact the system administrator."}))
   else
       if 200 ~= remote_res.status then
-          ngx.status = ngx.HTTP_UNAUTHORIZED
+          ngx.status = ngx.HTTP_BAD_GATEWAY
           ngx.log(ngx.ERR, " record_secret status err:", remote_res.status)
-          ngx.say(json.encode({msg="Authentication failed, please contact the system administrator."}))
+          ngx.say(json.encode({msg="Server Error, please contact the system administrator."}))
       end
   end
 
@@ -60,17 +60,17 @@ local ip = "127.0.0.1"
 local port = 6379
 local ok, err = red:connect(ip, port)
 if not ok then
-  ngx.status = ngx.HTTP_UNAUTHORIZED
+  ngx.status = ngx.HTTP_BAD_GATEWAY
   ngx.log(ngx.ERR, " redis connect error:", err)
-  ngx.say(json.encode({msg="Authentication failed, please contact the system administrator."}))
+  ngx.say(json.encode({msg="Server Error, please contact the system administrator."}))
   return
 end
 
 local res, err = red:auth("changepassword")
 if not res then
-  ngx.status = ngx.HTTP_UNAUTHORIZED
+  ngx.status = ngx.HTTP_BAD_GATEWAY
   ngx.log(ngx.ERR, " redis auth error:", err)
-  ngx.say(json.encode({msg="Authentication failed, please contact the system administrator."}))
+  ngx.say(json.encode({msg="Server Error, please contact the system administrator."}))
   return
 end
 
