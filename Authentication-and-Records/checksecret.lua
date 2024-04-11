@@ -38,11 +38,13 @@ local function record_secret(apikey)
   if remote_res == nil then
       ngx.status = ngx.HTTP_BAD_GATEWAY
       ngx.log(ngx.ERR, " record_secret:", err)
+      ngx.header['Content-Type'] = 'application/json; charset=utf-8'
       ngx.say(json.encode({msg="Server Error, please contact the system administrator."}))
   else
       if 200 ~= remote_res.status then
           ngx.status = ngx.HTTP_BAD_GATEWAY
           ngx.log(ngx.ERR, " record_secret status err:", remote_res.status)
+          ngx.header['Content-Type'] = 'application/json; charset=utf-8'
           ngx.say(json.encode({msg="Server Error, please contact the system administrator."}))
       end
   end
@@ -62,6 +64,7 @@ local ok, err = red:connect(ip, port)
 if not ok then
   ngx.status = ngx.HTTP_BAD_GATEWAY
   ngx.log(ngx.ERR, " redis connect error:", err)
+  ngx.header['Content-Type'] = 'application/json; charset=utf-8'
   ngx.say(json.encode({msg="Server Error, please contact the system administrator."}))
   return
 end
@@ -70,6 +73,7 @@ local res, err = red:auth("changepassword")
 if not res then
   ngx.status = ngx.HTTP_BAD_GATEWAY
   ngx.log(ngx.ERR, " redis auth error:", err)
+  ngx.header['Content-Type'] = 'application/json; charset=utf-8'
   ngx.say(json.encode({msg="Server Error, please contact the system administrator."}))
   return
 end
@@ -81,6 +85,7 @@ local apikey = headers.apikey
 if apikey == nil then
     ngx.status = ngx.HTTP_UNAUTHORIZED
     ngx.log(ngx.ERR, " header apikey doesn't exist.")
+    ngx.header['Content-Type'] = 'application/json; charset=utf-8'
     ngx.say(json.encode({msg="Authentication failed, please contact the system administrator."}))
     return close_redes(red)
 end
@@ -93,6 +98,7 @@ if not resp then
   secret_pass = false
   ngx.status = ngx.HTTP_UNAUTHORIZED
   ngx.log(ngx.ERR, " redis apikey doesn't exist.")
+  ngx.header['Content-Type'] = 'application/json; charset=utf-8'
   ngx.say(json.encode({msg="Authentication failed, please contact the system administrator."}))
   return close_redes(red)
 end
@@ -102,6 +108,7 @@ if resp == ngx.null then
   secret_pass = false
   ngx.status = ngx.HTTP_UNAUTHORIZED
   ngx.log(ngx.ERR, " redis apikey doesn't exist.")
+  ngx.header['Content-Type'] = 'application/json; charset=utf-8'
   ngx.say(json.encode({msg="Authentication failed, please contact the system administrator."}))
 end
 
